@@ -2,30 +2,31 @@
 namespace app;
 
 require_once "Model.php";
-require_once "Shop.php";
+require_once "Location.php";
 use function utils\gtsane as gtsane;
-use function utils\dump   as dump;
 
-class Location extends Model {
-  protected static $table       = "locations";
-  public    static $primary_col = "location_id";
-  protected        $relatables  = array(Shop::class); // Has many shops
+class Shop extends Model {
+  protected static $table       = "shops";
+  public    static $primary_col = "shop_id";
   protected        $uniques     = array("slug");
-  public           $fields      = array("name", "slug");
+  protected static $dependables = array(Location::class); // Belongs to one location
+  protected static $indexes     = array("location_id");
+  public           $fields      = array(
+                                    "name", "phone", "address", "slug",
+                                    "location_id"
+                                  );
   protected        $shops       = array(); // Has many shops
 
   /**
    * @abstract                Abstract overriden method of parent `Models` class
    */
   protected function mount(array $data): void {
-    $this->identifier = gtsane(static::$primary_col, $data);
-    $this->name       = gtsane("name", $data);
-    $this->slug       = gtsane("slug", $data);
-  }
-
-  public function load_relatables() {
-    $relatables = parent::load_relatables();
-    $this->shops = gtsane("Shop", $relatables);
+    $this->identifier  = gtsane(static::$primary_col, $data);
+    $this->name        = gtsane("name", $data);
+    $this->phone       = gtsane("phone", $data);
+    $this->address     = gtsane("address", $data) ?? NULL;
+    $this->slug        = gtsane("slug", $data);
+    $this->location_id = gtsane("location_id", $data);
   }
 
   // Overriden method, needed to create self instance for each record

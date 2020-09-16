@@ -6,11 +6,11 @@ require_once "Database.php";
 use \Exception;
 use function utils\get_name_by_reflection as get_name_by_reflection;
 // use function utils\insane                 as insane;
-// use function utils\dump                   as dump;
+use function utils\dump                   as dump;
 
 class RelationalModel {
-  protected static $indexes = array(); // Foreign indexes/keys
-  protected        $relatables = array(); // Has one/many
+  protected static $indexes     = array(); // Foreign indexes/keys
+  protected        $relatables  = array(); // Has one/many
   protected static $dependables = array(); // Belongs to one/many
   protected static $pivot; // Pivot table (if belongs to many)
 
@@ -28,7 +28,7 @@ class RelationalModel {
 
   public function load_relatables() {
     if (! $this->has_relatables()) return; // No relations defined
-    foreach ($relatables as $relatable) {
+    foreach ($this->relatables as $relatable) {
       $class = get_name_by_reflection($relatable);
       $instances[$class] = $relatable::referenced([$this]);
     }
@@ -36,12 +36,12 @@ class RelationalModel {
   }
 
   public static function referenced(array $models): array {
-    $models = self::check_dependables($model);
+    $models = self::check_dependables($models);
     if (! $models)
       throw new Exception("Cannot fetch by reference: Invalid reference passed for current model!");
     if (! static::check_table())
       throw new Exception("No table explicitly defined for current model!");
-    $models = check_dependables($models);
+    $models = self::check_dependables($models);
     global $database;
     // Add where clause for each reference passed i.e. (WHERE `parent1_id` = '' AND `parent2_id` = '')
     foreach($models as $model)
@@ -91,7 +91,7 @@ class RelationalModel {
     if ($ignore_index) return true;
     foreach ($models as $model)
       // No foreign index/key matches with the (passed) model's primary index/key
-      if (! \in_array($model::primary_col, static::$indexes, true)) return false;
+      if (! \in_array($model::$primary_col, static::$indexes, true)) return false;
     // return the sanitized models
     return $models; // Everthing is okay :)
   }
@@ -106,12 +106,8 @@ class RelationalModel {
    *                              inside the relatables then an exception will be
    *                              thrown
    */
-  protected function has_relatables(): bool {
-    if (count($this->relatables) == 0) return false;
-    foreach($this->relatables as $relatable)
-      if (! $relatable instanceof self)
-        throw new Exception("Invalid relatables provided for current model");
-    return true;
+  protected function has_relatables(): bool {    
+    return count($this->relatables) == 0 ? false : true;
   }
   
   /**
@@ -125,11 +121,7 @@ class RelationalModel {
    *                              thrown
    */
   protected static function has_dependables(): bool {
-    if (count(static::$dependables) == 0) return false;
-    foreach(static::$dependables as $dependency)
-      if (! $dependency instanceof self)
-        throw new Exception("Invalid dependencies provided for current model");
-    return true;
+    return count(static::$dependables) > 0 ? true : false;
   }
 
   /**
