@@ -12,7 +12,7 @@ class Location extends Model {
   protected        $relatables  = array(Shop::class); // Has many shops
   protected        $uniques     = array("slug");
   public           $fields      = array("name", "slug");
-  protected        $shops       = array(); // Has many shops
+  public           $shops       = array(); // Has many shops
 
   /**
    * @abstract                Abstract overriden method of parent `Models` class

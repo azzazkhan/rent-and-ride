@@ -7,7 +7,7 @@ require_once "RelationalModal.php";
 
 use \Exception                            as Exception;
 use function utils\insane                 as insane;
-// use function utils\dump                   as dump;
+use function utils\dump                   as dump;
 
 abstract class Model extends RelationalModel {
   protected        $identifier; // Primary key (set by `mount` method)
@@ -122,8 +122,7 @@ abstract class Model extends RelationalModel {
       // Model reference passed for model which does not have any composite index
       if (count($this->composite_uniques()) == 0)
         throw new Exception("Reference models passed for model which does not has any explicitly defined composite unique index with foreign index");
-      // TODO: Implement relational functions
-      die("TODO: Implement fetching unique record by composite unique indexes with foreign index.");
+      return $this->unique_by_reference($reference, $models);
     }
     /**
      * ===================================================================
@@ -140,7 +139,7 @@ abstract class Model extends RelationalModel {
     foreach ($uniques as $field)
       $conditions[] = \sprintf("`%s` = '%s'", $field, $reference);
     // Join all conditions for WHERE statement and add "AND" clause between them.
-    $conditions = \implode(" AND ", $conditions);
+    $conditions = \implode(" OR ", $conditions);
     $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE %s LIMIT 1", static::$table, $conditions));
     // No record found for passed search reference (terminate the script)
     if ($query->num_rows == 0)

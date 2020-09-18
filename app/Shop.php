@@ -4,18 +4,19 @@ namespace app;
 require_once "Model.php";
 require_once "Location.php";
 use function utils\gtsane as gtsane;
+use function utils\dump   as dump;
 
 class Shop extends Model {
   protected static $table       = "shops";
   public    static $primary_col = "shop_id";
-  protected        $uniques     = array("slug");
+  protected        $uniques     = array("@slug");
   protected static $dependables = array(Location::class); // Belongs to one location
   protected static $indexes     = array("location_id");
   public           $fields      = array(
                                     "name", "phone", "address", "slug",
                                     "location_id"
                                   );
-  protected        $shops       = array(); // Has many shops
+  public           $location; // Blongs to one location
 
   /**
    * @abstract                Abstract overriden method of parent `Models` class
@@ -27,6 +28,11 @@ class Shop extends Model {
     $this->address     = gtsane("address", $data) ?? NULL;
     $this->slug        = gtsane("slug", $data);
     $this->location_id = gtsane("location_id", $data);
+  }
+
+  public function load_dependables() {
+    $dependencies = parent::load_dependables();
+    $this->location = gtsane("Location", $dependencies);
   }
 
   // Overriden method, needed to create self instance for each record

@@ -8,7 +8,8 @@ use function utils\dump as dump;
 use app\Location        as Location;
 use app\Shop            as Shop;
 
-$shop = new Shop("toyota-motors");
+$location = new Location(1);
+$shop = new Shop("frontier-motors", [$location]);
 // $shop->load_relatables();
 $shop->load_dependables();
-dump($shop);
+printf("%s &mdash; %s<br />\n", $shop->name, $shop->location->name);

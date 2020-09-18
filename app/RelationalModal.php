@@ -35,6 +35,32 @@ class RelationalModel {
     return $instances;
   }
 
+  protected function unique_by_reference(string $reference, array $models) {
+    $models = self::check_dependables($models);
+    if (! $models || count($models) == 0)
+      throw new Exception("Invalid reference passed to search through composite unique index!");
+    global $database;
+    // `slug`    = 'frontier-motors' AND `location_id` = 1 OR
+    // `address` = 'peshawar-motors' AND `location_id` = 1
+    $composite_uniques = $this->composite_uniques(true);
+    foreach ($composite_uniques as $unique_index) {
+      $clause = [];
+      $clause[] = \sprintf("`%s` = '%s'", $unique_index, $reference);
+      foreach ($models as $model)
+        $clause[] = \sprintf("`%s` = '%s'", $model::$primary_col, $model->id());
+      $conditional_query[] = \implode(" AND ", $clause);
+    }
+    // foreach($models as $model)
+    //   $conditional_query[] = \sprintf("`%s` = %d", $model::$primary_col, $model->id());
+    // Merge into one SQL conditional statement
+    // $conditional_query = \implode(" AND ", $conditional_query);
+
+    $sql = \sprintf("SELECT * FROM `%s` WHERE %s", static::$table, \implode(" OR ", $conditional_query));
+    dump($sql);
+    exit;
+    return [];
+  }
+
   public static function referenced(array $models): array {
     $models = self::check_dependables($models);
     if (! $models)
