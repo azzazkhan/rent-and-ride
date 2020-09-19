@@ -63,11 +63,11 @@ abstract class Model extends RelationalModel {
       $this->mount($this->fetch_by_id($ref));
 
     // Raw data already verified on initial validation of this method, mount it
-    elseif (\is_array($ref)) $this->mount($ref);
+    else if (\is_array($ref)) $this->mount($ref);
 
     // A search string is passed, exact record can be fetched, if the model has independ unique key(s)
     // Maybe the model has a composite unique index with an index field, pass the reference model as well
-    elseif (\is_string($ref))
+    else if (\is_string($ref))
       // Mount the fetched data on current object
       $this->mount($this->fetch_by_unique_columns($ref, $models));
     

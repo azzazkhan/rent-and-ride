@@ -29,6 +29,7 @@ class RelationalModel {
   public function load_relatables() {
     if (! $this->has_relatables()) return; // No relations defined
     foreach ($this->relatables as $relatable) {
+      dump($relatable); exit;
       $class = get_name_by_reflection($relatable);
       $instances[$class] = $relatable::referenced([$this]);
     }
@@ -50,15 +51,8 @@ class RelationalModel {
         $clause[] = \sprintf("`%s` = '%s'", $model::$primary_col, $model->id());
       $conditional_query[] = \implode(" AND ", $clause);
     }
-    // foreach($models as $model)
-    //   $conditional_query[] = \sprintf("`%s` = %d", $model::$primary_col, $model->id());
-    // Merge into one SQL conditional statement
-    // $conditional_query = \implode(" AND ", $conditional_query);
-
-    $sql = \sprintf("SELECT * FROM `%s` WHERE %s", static::$table, \implode(" OR ", $conditional_query));
-    dump($sql);
-    exit;
-    return [];
+    $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE %s LIMIT 1", static::$table, \implode(" OR ", $conditional_query)));
+    return $query->num_rows > 0 ? $query->fetch_assoc() : [];
   }
 
   public static function referenced(array $models): array {
@@ -114,7 +108,8 @@ class RelationalModel {
       if (! $check) return false;
     }
     // Ignore matching foreign index/keys with (passed) model's primary index/key
-    if ($ignore_index) return true;
+    // If pivot table is passed then indexes will be defined inside pivot table
+    if ($ignore_index || self::has_pivot_table()) return true;
     foreach ($models as $model)
       // No foreign index/key matches with the (passed) model's primary index/key
       if (! \in_array($model::$primary_col, static::$indexes, true)) return false;
@@ -176,7 +171,7 @@ class RelationalModel {
    * @throws Exception      Throws an exception if pivot table name is not
    *                        explicitly defined on child instance
    */
-  private function check_pivot(): bool {
+  private static function has_pivot_table(): bool {
     return (! static::$pivot || ! is_string(static::$pivot) || \strlen(static::$pivot) == 0) ? false : true;
   }
 

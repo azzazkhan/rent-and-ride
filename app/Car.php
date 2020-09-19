@@ -2,22 +2,21 @@
 namespace app;
 
 require_once "Model.php";
-require_once "Location.php";
-require_once "Car.php";
+require_once "Shop.php";
 use function utils\gtsane as gtsane;
+use function utils\dump   as dump;
 
-class Shop extends Model {
-  protected static $table       = "shops";
-  public    static $primary_col = "shop_id";
-  protected        $uniques     = array("@slug");
-  protected static $dependables = array(Location::class); // Belongs to one location
-  protected        $relatables  = array(Car::class);
-  protected static $indexes     = array("location_id");
+class Car extends Model {
+  protected static $table       = "cars";
+  public    static $primary_col = "car_id";
+  protected        $uniques     = array("slug");
+  protected static $dependables = array(Shop::class); // Belongs to one location
   public           $fields      = array(
-                                    "name", "phone", "address", "slug",
-                                    "location_id"
+                                    "name", "specifications", "daily_price",
+                                    "weekly_price", "slug", "tags"
                                   );
-  public           $location; // Blongs to one location
+  protected static $pivot       = "car_shop";
+  public           $shops; // Blongs to many shops
 
   /**
    * @abstract                Abstract overriden method of parent `Models` class
