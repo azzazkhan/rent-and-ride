@@ -18,6 +18,7 @@ class Shop extends Model {
                                     "location_id"
                                   );
   public           $location; // Blongs to one location
+  public           $cars        = array(); // Has many cars
 
   /**
    * @abstract                Abstract overriden method of parent `Models` class

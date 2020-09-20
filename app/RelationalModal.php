@@ -29,7 +29,6 @@ class RelationalModel {
   public function load_relatables() {
     if (! $this->has_relatables()) return; // No relations defined
     foreach ($this->relatables as $relatable) {
-      dump($relatable); exit;
       $class = get_name_by_reflection($relatable);
       $instances[$class] = $relatable::referenced([$this]);
     }
@@ -63,15 +62,31 @@ class RelationalModel {
       throw new Exception("No table explicitly defined for current model!");
     $models = self::check_dependables($models);
     global $database;
+    if (self::has_pivot_table()) {
+      // Add where clause for each reference passed i.e. (WHERE `parent1_id` = '' AND `parent2_id` = '')
+      foreach($models as $model)
+        $conditional_query[] = \sprintf("`%s` = %d", $model::$primary_col, $model->id());
+      // Merge into one SQL conditional statement
+      $conditional_query = \implode(" AND ", $conditional_query);
+      $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE %s", static::$table, $conditional_query));
+      // shop_id = 3
+      // SELECT `car_id` FROM `car_shop` WHERE `shop_id` = 3 // 1, 2, 3
+      // SELECT * FROM `cars` WHERE `car_id` IN (1, 2, 3)
+      return [];
+    }
     // Add where clause for each reference passed i.e. (WHERE `parent1_id` = '' AND `parent2_id` = '')
     foreach($models as $model)
       $conditional_query[] = \sprintf("`%s` = %d", $model::$primary_col, $model->id());
     // Merge into one SQL conditional statement
     $conditional_query = \implode(" AND ", $conditional_query);
-    $query = $database->query(sprintf("SELECT * FROM `%s` WHERE %s", static::$table, $conditional_query));
+    $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE %s", static::$table, $conditional_query));
 
     // If data is found then return an array of associative array else an empty array
     return $query->num_rows > 0 ? $query->fetch_all(MYSQLI_ASSOC) : [];
+  }
+
+  private static function get_pivot_relational_parents(array $models) {
+    // Sinitized data will be passed
   }
   
   /** 
@@ -109,7 +124,7 @@ class RelationalModel {
     }
     // Ignore matching foreign index/keys with (passed) model's primary index/key
     // If pivot table is passed then indexes will be defined inside pivot table
-    if ($ignore_index || self::has_pivot_table()) return true;
+    if ($ignore_index || self::has_pivot_table()) return $models;
     foreach ($models as $model)
       // No foreign index/key matches with the (passed) model's primary index/key
       if (! \in_array($model::$primary_col, static::$indexes, true)) return false;
