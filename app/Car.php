@@ -3,6 +3,7 @@ namespace app;
 
 require_once "Model.php";
 require_once "Shop.php";
+require_once "Application.php";
 use function utils\gtsane as gtsane;
 use function utils\dump   as dump;
 
@@ -11,12 +12,15 @@ class Car extends Model {
   public    static $primary_col = "car_id";
   protected        $uniques     = array("slug");
   protected static $dependables = array(Shop::class); // Belongs to one location
+   // Has many applications
+  protected        $relatables  = array(Application::class);
   public           $fields      = array(
                                     "name", "specifications", "daily_price",
                                     "weekly_price", "slug", "tags"
                                   );
   protected static $pivot       = "car_shop";
   public           $shops; // Blongs to many shops
+  public           $applications; // Has many applications
 
   /**
    * @abstract                Abstract overriden method of parent `Models` class
@@ -29,6 +33,11 @@ class Car extends Model {
     $this->weekly_price   = gtsane("weekly_price", $data) ?? NULL;
     $this->slug           = gtsane("slug", $data);
     $this->tags           = gtsane("tags", $data) ?? NULL;
+  }
+
+  public function load_relatables() {
+    $relatables = parent::load_relatables();
+    $this->applications = gtsane("Application", $relatables);
   }
 
   public function load_dependables() {
