@@ -17,7 +17,7 @@ abstract class Model extends RelationalModel {
   // Unique indexes or composite unique indexes with foreign key columns
   protected        $uniques     = array();
   // All field names (excluding primary key)
-  public           $fields      = array();
+  public static    $fields      = array();
 
   /**
    * Creates new instance of model and mounts provided data (after validating)
@@ -176,6 +176,8 @@ abstract class Model extends RelationalModel {
    */
   public function id(): int { return $this->identifier; }
 
+  public static function create() {}
+
   /** 
    * =====================================================================
    *    ABSTRACT METHODS
@@ -227,9 +229,9 @@ abstract class Model extends RelationalModel {
    *                            defined on child class
    *                            
    */
-  protected function verify_fields(array $row): bool {
+  protected static function verify_fields(array $row): bool {
     // Get all field names (including primary key) and match field count with elements in passed array
-    $fields = $this->fields; \array_unshift($fields, static::$primary_col);
+    $fields = static::fields; \array_unshift($fields, static::$primary_col);
     if (count($fields) != count($row)) return false;
 
     // Each key name must correspond to model's field name!

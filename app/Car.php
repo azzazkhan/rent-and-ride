@@ -14,7 +14,7 @@ class Car extends Model {
   protected static $dependables = array(Shop::class); // Belongs to one location
    // Has many applications
   protected        $relatables  = array(Application::class);
-  public           $fields      = array(
+  public static    $fields      = array(
                                     "name", "specifications", "daily_price",
                                     "weekly_price", "slug", "tags"
                                   );

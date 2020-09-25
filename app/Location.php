@@ -11,7 +11,7 @@ class Location extends Model {
   public    static $primary_col = "location_id";
   protected        $relatables  = array(Shop::class); // Has many shops
   protected        $uniques     = array("slug");
-  public           $fields      = array("name", "slug");
+  public static    $fields      = array("name", "slug");
   public           $shops       = array(); // Has many shops
 
   /**

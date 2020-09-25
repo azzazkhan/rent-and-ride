@@ -13,7 +13,7 @@ class Application extends Model {
   // Belongs to one car and one shop
   protected static $dependables = array(Car::class, Shop::class);
   protected static $indexes     = array("car_id", "shop_id");
-  public           $fields      = array(
+  public static    $fields      = array(
                                     "name", "email", "contact", "nic_number",
                                     "address", "car_id", "shop_id", "submitted_at"
                                   );

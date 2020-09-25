@@ -16,7 +16,7 @@ class Shop extends Model {
   // Has many cars and many applications
   protected        $relatables  = array(Car::class, Application::class);
   protected static $indexes     = array("location_id");
-  public           $fields      = array(
+  public static    $fields      = array(
                                     "name", "phone", "address", "slug",
                                     "location_id"
                                   );
