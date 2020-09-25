@@ -95,21 +95,21 @@ abstract class Model extends RelationalModel {
     return $query->fetch_assoc();
   }
 
-  /** 
-   * =====================================================================
-   *   TODO: Write documentation for this method
-   * =====================================================================
-   */
   /**
    * Fetchs unique (single) record of model through explicitly specified
    * independent unique indexes or composite unique indexes with foregin indexes
    * through reference of passed models.
    * 
-   * @param string $reference
-   * @param array $models           (Optional)
+   * @param string $reference       The unique key used to fetch record. e.g slug
+   * @param array $models           If there is a composite unique index of a
+   *                                column with a foreign key/index then pass
+   *                                the reference models.
    * 
-   * @return array
-   * @throws Exception
+   * @return array                  Returned raw data
+   * @throws Exception              Throws an exception if no independent/composite
+   *                                unique indexes are defined for current model
+   *                                or passed reference models are not defined
+   *                                as a dependency for current model
    */
   protected function fetch_by_unique_columns(string $reference, array $models = []): array {
     if (! $this->has_uniques())
@@ -176,17 +176,36 @@ abstract class Model extends RelationalModel {
    */
   public function id(): int { return $this->identifier; }
 
-  public static function create(array $data) {
-    if (! static::verify_fields($data, true))
+  /**
+   * Inserts passed data into the database for current model
+   * 
+   * @param array $data             The data to be inserted in database in an
+   *                                associative array who's key must match
+   *                                with the field names of current model
+   * @param bool $primary_key       Specifiy wether primary key is also passed
+   *                                or not (if not then `NULL` will be passed
+   *                                as the value)
+   * 
+   * @return bool                   Return TRUE if query executed successfully else
+   *                                FALSE
+   */
+  public static function create(array $data, bool $primary_key = false) {
+    // Check if all fields are specified in passed data
+    if (! static::verify_fields($data, !$primary_key))
       throw new Exception("Cannot insert model! Incompaitable data passed!");
+
     global $database;
+    // Arrange the field names into proper SQL syntax
     foreach (static::$fields as $field)
-      $fields[] = \sprintf("`%s`", $field);
+    $fields[] = \sprintf("`%s`", $field);
     $fields = \implode(", ", $fields);
+    
+    // Arrange the field values into proper SQL syntax
     foreach ($data as $val)
       $values[] = \sprintf('"%s"', $val);
     $values = \implode(", ", $values);
-    // INSERT INTO `applications` (`app_id`, `name`, `email`, `contact`, `nic_number`, `address`, `car_id`, `shop_id`, `submitted_at`) VALUES (NULL, 'Azzaz Khan', 'students.mails9@gmail.com', '03369596578', '34202-4551234-1', 'House D-10, Muslim City colony, Tarnab Farm, Peshawar', '2', '1', current_timestamp());
+
+    // Execute the query and return the result
     $query = $database->query(\sprintf("INSERT INTO `%s` (%s) VALUES (%s)", static::$table, $fields, $values));
     return $query;
   }
