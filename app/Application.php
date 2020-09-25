@@ -26,7 +26,7 @@ class Application extends Model {
   protected function mount(array $data): void {
     $this->identifier   = gtsane(static::$primary_col, $data);
     $this->name         = gtsane("name", $data);
-    $this->email        = gtsane("email", $data);
+    $this->email        = gtsane("email", $data) ?? NULL;
     $this->contact      = gtsane("contact", $data);
     $this->nic_number   = gtsane("nic_number", $data);
     $this->address      = gtsane("address", $data);

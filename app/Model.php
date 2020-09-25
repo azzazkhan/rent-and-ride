@@ -176,7 +176,20 @@ abstract class Model extends RelationalModel {
    */
   public function id(): int { return $this->identifier; }
 
-  public static function create() {}
+  public static function create(array $data) {
+    if (! static::verify_fields($data, true))
+      throw new Exception("Cannot insert model! Incompaitable data passed!");
+    global $database;
+    foreach (static::$fields as $field)
+      $fields[] = \sprintf("`%s`", $field);
+    $fields = \implode(", ", $fields);
+    foreach ($data as $val)
+      $values[] = \sprintf('"%s"', $val);
+    $values = \implode(", ", $values);
+    // INSERT INTO `applications` (`app_id`, `name`, `email`, `contact`, `nic_number`, `address`, `car_id`, `shop_id`, `submitted_at`) VALUES (NULL, 'Azzaz Khan', 'students.mails9@gmail.com', '03369596578', '34202-4551234-1', 'House D-10, Muslim City colony, Tarnab Farm, Peshawar', '2', '1', current_timestamp());
+    $query = $database->query(\sprintf("INSERT INTO `%s` (%s) VALUES (%s)", static::$table, $fields, $values));
+    return $query;
+  }
 
   /** 
    * =====================================================================
@@ -229,9 +242,10 @@ abstract class Model extends RelationalModel {
    *                            defined on child class
    *                            
    */
-  protected static function verify_fields(array $row): bool {
+  protected static function verify_fields(array $row, bool $ignore_pk = false): bool {
     // Get all field names (including primary key) and match field count with elements in passed array
-    $fields = static::fields; \array_unshift($fields, static::$primary_col);
+    $fields = static::$fields;
+    if (! $ignore_pk) \array_unshift($fields, static::$primary_col);
     if (count($fields) != count($row)) return false;
 
     // Each key name must correspond to model's field name!
