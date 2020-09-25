@@ -251,15 +251,15 @@ abstract class Model extends RelationalModel {
     // No unique index explicitly defined for current model
     if (! \is_array($this->uniques) || count($this->uniques) == 0) return false;
     // Number of defined unique indexes exceeds the total number of defined fields (primary index/key not included)
-    if (count($this->uniques) > count($this->fields))
+    if (count($this->uniques) > count(static::$fields))
       throw new Exception("Number of explicitly defined unique indexes is greater than fields defined for current model!");
     // Iterate over each explicitly defined unique index
     foreach ($this->uniques as $unique_field)
       // Each independent/composite unique index must be explicitly defined as a field of current model!
       // If the unique index's name does matches then it might be a composite unique index, omit the initial symbol (@) and try again
       if (! (
-        \in_array($unique_field, $this->fields, true) ||
-        \in_array(\substr($unique_field, 1), $this->fields, true)
+        \in_array($unique_field, static::$fields, true) ||
+        \in_array(\substr($unique_field, 1), static::$fields, true)
       )) // The independent/composite unique index is not explicitly defined as a field of current model!
         throw new Exception(\sprintf("Explicitly defined unique index (%s) not found in fields defined for current model!", $unique_field));
     // Everthing is fine :)
@@ -344,13 +344,13 @@ abstract class Model extends RelationalModel {
     if (! is_null($this->identifier) && ! \is_numeric($this->identifier))
       throw new Exception("Primary index/key must be a numeric value");
     // Make sure that at least one field is explicitly defined for current model
-    if (! \is_array($this->fields) || count($this->fields) == 0)
+    if (! \is_array(static::$fields) || count(static::$fields) == 0)
       throw new Exception("No fields explicitly defined for current model!");
     // Explicitly defined fields must not contain any duplicates!
-    if (count($this->fields) > count(array_unique($this->fields)))
+    if (count(static::$fields) > count(array_unique(static::$fields)))
       throw new Exception("Duplicate fields found current model's fields!");
     // Each field explicitly defined must be in string format
-    foreach ($this->fields as $field)
+    foreach (static::$fields as $field)
       if (! \is_string($field) || \strlen($field) == 0)
         throw new Exception("Explicitly defined fields must be in string formate!");
     // This method independently throws exception, no conditions required
