@@ -16,6 +16,18 @@ class RelationalModel {
 
   public function load_dependables() {
     if (! $this->has_dependables()) return; // No relations defined
+    if (self::has_pivot_table()) {
+      foreach (static::$dependables as $dependency) {
+        $parent_ids = $this->get_parent_ids($dependency);
+        if (count($parent_ids) == 0) break;
+        foreach ($parent_ids as $id) {
+          $models[] = new $dependency($id);
+        }
+        $class = get_name_by_reflection($dependency);
+        $instances[$class] = $models;
+      }
+      return $instances;
+    }
     foreach(static::$dependables as $dependency) {
       // Fetch short class name by model reference
       $class = get_name_by_reflection($dependency);
@@ -24,6 +36,15 @@ class RelationalModel {
       );
     }
     return $instances;
+  }
+
+  private function get_parent_ids($model) {
+    global $database;
+    $query = $database->query(\sprintf("SELECT `%s` FROM `%s` WHERE `%s` = %s", $model::$primary_col, static::$pivot, static::$primary_col, $this->id()));
+    if ($query->num_rows == 0) return false;
+    foreach ($query->fetch_all(MYSQLI_NUM) as $row)
+      $ids[] = $row[0];
+    return $ids;
   }
 
   public function load_relatables() {
@@ -63,16 +84,14 @@ class RelationalModel {
     $models = self::check_dependables($models);
     global $database;
     if (self::has_pivot_table()) {
-      // Add where clause for each reference passed i.e. (WHERE `parent1_id` = '' AND `parent2_id` = '')
-      foreach($models as $model)
-        $conditional_query[] = \sprintf("`%s` = %d", $model::$primary_col, $model->id());
-      // Merge into one SQL conditional statement
-      $conditional_query = \implode(" AND ", $conditional_query);
-      $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE %s", static::$table, $conditional_query));
-      // shop_id = 3
-      // SELECT `car_id` FROM `car_shop` WHERE `shop_id` = 3 // 1, 2, 3
-      // SELECT * FROM `cars` WHERE `car_id` IN (1, 2, 3)
-      return [];
+      $referenced_ids = self::get_relational_ids($models);
+      if (count($referenced_ids) == 0) return [];
+      $conditional_query = [];
+      foreach ($referenced_ids as $id)
+        $conditional_query[] = \sprintf('%s', $id);
+      $conditional_query = \implode(", ", $conditional_query);
+      $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE `%s` IN (%s)", static::$table, static::$primary_col, $conditional_query));
+      return $query->num_rows == 0 ? [] : $query->fetch_all(MYSQLI_ASSOC);
     }
     // Add where clause for each reference passed i.e. (WHERE `parent1_id` = '' AND `parent2_id` = '')
     foreach($models as $model)
@@ -85,8 +104,18 @@ class RelationalModel {
     return $query->num_rows > 0 ? $query->fetch_all(MYSQLI_ASSOC) : [];
   }
 
-  private static function get_pivot_relational_parents(array $models) {
-    // Sinitized data will be passed
+  private static function get_relational_ids(array $models): array {
+    global $database;
+    // Add where clause for each reference passed i.e. (WHERE `parent1_id` = '' AND `parent2_id` = '')
+    foreach($models as $model)
+      $conditional_query[] = \sprintf("`%s` = %d", $model::$primary_col, $model->id());
+    // Merge into one SQL conditional statement
+    $conditional_query = \implode(" AND ", $conditional_query);
+    $query = $database->query(\sprintf("SELECT `%s` FROM `%s` WHERE %s", static::$primary_col, static::$pivot, $conditional_query));
+    $ids = [];
+    foreach ($query->fetch_all(MYSQLI_NUM) as $row)
+      $ids[] = $row[0];
+    return $ids;
   }
   
   /** 

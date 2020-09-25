@@ -9,10 +9,3 @@ use function utils\dump as dump;
 use app\Location        as Location;
 use app\Shop            as Shop;
 use app\Car             as Car;
-
-$shop = new Shop(3);
-$shop->load_relatables();
-dump($shop->cars);
-// $shop_new = new Shop("frontier-motors", [new Location(1)]);
-// $shop_new->load_dependables();
-// printf("%s &mdash; %s<br />\n", $shop->name, $shop->location->name);

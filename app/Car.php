@@ -22,17 +22,27 @@ class Car extends Model {
    * @abstract                Abstract overriden method of parent `Models` class
    */
   protected function mount(array $data): void {
-    $this->identifier  = gtsane(static::$primary_col, $data);
-    $this->name        = gtsane("name", $data);
-    $this->phone       = gtsane("phone", $data);
-    $this->address     = gtsane("address", $data) ?? NULL;
-    $this->slug        = gtsane("slug", $data);
-    $this->location_id = gtsane("location_id", $data);
+    $this->identifier     = gtsane(static::$primary_col, $data);
+    $this->name           = gtsane("name", $data);
+    $this->specifications = gtsane("specifications", $data) ?? NULL;
+    $this->daily_price    = gtsane("daily_price", $data) ?? NULL;
+    $this->weekly_price   = gtsane("weekly_price", $data) ?? NULL;
+    $this->slug           = gtsane("slug", $data);
+    $this->tags           = gtsane("tags", $data) ?? NULL;
   }
 
   public function load_dependables() {
     $dependencies = parent::load_dependables();
-    $this->location = gtsane("Location", $dependencies);
+    $this->shops = gtsane("Shop", $dependencies);
+  }
+
+  public static function referenced(array $models): array {
+    $data = parent::referenced($models);
+    if (count($data) == 0) return [];
+    $instances = [];
+    foreach($data as $row)
+      $instances[] = new self($row);
+    return $instances;
   }
 
   // Overriden method, needed to create self instance for each record

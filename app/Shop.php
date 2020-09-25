@@ -32,9 +32,23 @@ class Shop extends Model {
     $this->location_id = gtsane("location_id", $data);
   }
 
+  public function load_relatables() {
+    $relatables = parent::load_relatables();
+    $this->cars = gtsane("Car", $relatables);
+  }
+
   public function load_dependables() {
     $dependencies = parent::load_dependables();
     $this->location = gtsane("Location", $dependencies);
+  }
+
+  public static function referenced(array $models): array {
+    $data = parent::referenced($models);
+    if (count($data) == 0) return [];
+    $instances = [];
+    foreach($data as $row)
+      $instances[] = new self($row);
+    return $instances;
   }
 
   // Overriden method, needed to create self instance for each record
