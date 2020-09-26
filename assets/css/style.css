@@ -237,7 +237,7 @@ header .social-icons-list .social-item a:hover {
   color: white;
 }
 header .social-icons-list .social-item a .fa {
-  font-size: 20px;
+  font-size: 30px;
 }
 header .social-icons-list .social-item:last-of-type a {
   margin-right: 0;
@@ -797,7 +797,7 @@ main.has-social-footer {
   color: white;
 }
 .social-icons-footer .social-icon a .fa {
-  font-size: 20px;
+  font-size: 30px;
 }
 .social-icons-footer .social-icon:last-of-type a {
   margin-right: 0;

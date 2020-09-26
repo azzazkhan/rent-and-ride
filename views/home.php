@@ -60,8 +60,9 @@
         Go, Find & Explore
       </h1>
       <div class="d-flex justify-content-center pt-5 pb-4">
+        <!-- btn custom primary bold invert pilled wide text-uppercase -->
         <button
-          class="btn custom primary bold invert pilled wide text-uppercase"
+          class="btn custom primary bold invert pilled wide"
         >
           Book Now
         </button>

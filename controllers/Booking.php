@@ -6,7 +6,6 @@ require_once ABS_PATH . "app/Application.php";
 
 use function utils\insane as insane;
 use function utils\gtsane as gtsane;
-use function utils\dump   as dump;
 
 // We only accept post requests
 if ($_SERVER["REQUEST_METHOD"] != "POST")
@@ -30,6 +29,7 @@ if (gtsane("action") == "create") {
   ]);
   if (! $store)
     die("Cloud not add application data into database!");
+  // If application was added succesfully then redirect to homepage
   header("Location: /");
 }
 
