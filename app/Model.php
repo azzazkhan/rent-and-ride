@@ -8,7 +8,6 @@ require_once "RelationalModal.php";
 use \Exception            as Exception;
 use function utils\insane as insane;
 use function utils\gtsane as gtsane;
-use function utils\dump   as dump;
 
 abstract class Model extends RelationalModel {
   protected        $identifier; // Primary key (set by `mount` method)
@@ -36,6 +35,7 @@ abstract class Model extends RelationalModel {
    *                           that values on current instance.
    * @param array $models   (Optional) Reference models required for fetching
    *                        models that have composite index on unique fields.
+   * 
    * @return void           Creates instance of child model class.
    * @throws Exception      Throws an exception if passed reference/data
    *                        validation fails.
@@ -54,13 +54,12 @@ abstract class Model extends RelationalModel {
         if (! self::are_valid_models($models))
           throw new Exception("Cannot instantiate model! Error: Passed reference model(s) are invalid model(s)!");
     
-    // Make sure that child classes follows our specified rules
+    // Make sure that child classes follows our rules!
     $this->sanitize(); // Initial bootstrap validations
 
     // We can proceed, verifying our data
     // Primary key is passed, we can fetch the exact record
-    if (\is_numeric($ref))
-      // Mount the fetched data on current object
+    if (\is_numeric($ref)) // Mount the fetched data on current object
       $this->mount($this->fetch_by_id($ref));
 
     // Raw data already verified on initial validation of this method, mount it
@@ -91,7 +90,7 @@ abstract class Model extends RelationalModel {
     $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE `%s` = %d LIMIT 1", static::$table, static::$primary_col, $id));
     // No record found, object cannot be created!
     if ($query->num_rows == 0)
-      die(\sprintf("No records found against model ID (%s)", $id));
+      die(\sprintf("No records found for model against primary identifier (%s)", $id));
     // Return as associative array having key names indentical to column names
     return $query->fetch_assoc();
   }
@@ -106,56 +105,59 @@ abstract class Model extends RelationalModel {
    *                                column with a foreign key/index then pass
    *                                the reference models.
    * 
-   * @return array                  Returned raw data
+   * @return array                  Returns raw data retrieved for current model
+   *                                with provided reference keyword and models
    * @throws Exception              Throws an exception if no independent/composite
    *                                unique indexes are defined for current model
    *                                or passed reference models are not defined
    *                                as a dependency for current model
    */
   protected function fetch_by_unique_columns(string $reference, array $models = []): array {
+    // Make sure that at least one independent/composite unique index is defined for current model
     if (! $this->has_uniques())
       throw new Exception("No independent unique or composite unique index explicitly defined for current model!");
     // If model references are passed then only composite unique indexes will be used with foreign indexes to search for record
-    if (count($models) > 0) {
+    // If composite unique indexes are not defined then ignore the passed reference models
+    if (count($models) > 0 && count($this->composite_uniques()) > 0) {
       // Invalid models passed
       if (! self::are_valid_models($models))
         throw new Exception("Invalid models passed as reference with unique model search!");
-      // Model reference passed for model which does not have any composite index
-      if (count($this->composite_uniques()) == 0)
-        throw new Exception("Reference models passed for model which does not has any explicitly defined composite unique index with foreign index");
       return $this->unique_by_reference($reference, $models);
     }
     /**
      * ===================================================================
-     * No reference model passed, continue with independent unique indexes
+     * No reference model passed or composite unique index defined!
      * ===================================================================
      */
-    // Model does not have any independent unique index explicitly defined
+    // Model does not have any independent unique index explicitly defined which means that current model doesn't have capability of retrieving unique record through non-primary index
     if (count($this->independent_uniques()) == 0)
       throw new Exception("No independent unique index explicitly defined for current model!");
     // Everthing is OK, we're good to go :)
     global $database;
     // Get independent unique indexes of current model
     $uniques = $this->independent_uniques();
+    // SELECT * FROM `table` WHERE `unique_field_1` = "passed_phrase" OR `unique_field_2` = "passed_phrase" ... LIMIT 1
     foreach ($uniques as $field)
       $conditions[] = \sprintf("`%s` = '%s'", $field, $reference);
-    // Join all conditions for WHERE statement and add "AND" clause between them.
+    // Join all conditions for WHERE statement and add "OR" clause between them.
     $conditions = \implode(" OR ", $conditions);
     $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE %s LIMIT 1", static::$table, $conditions));
-    // No record found for passed search reference (terminate the script)
+    // No record found for passed search reference
     if ($query->num_rows == 0)
+      // We're terminating the script but a visual cloud be displayed if constructor method is a bit tweaked
       die(\sprintf(
         "No records found against model search (<strong>%s</strong>)", $reference
       ));
+    // Return as associative array having key names indentical to column names
     return $query->fetch_assoc();
   }
 
   /**
-   * Fetchs all records of current model from database.
+   * This method fetchs **raw data** of all entries for current model from the
+   * database. It is recommended to override this method to create self instances
+   * for each record fetched and mount the data on it (if required)
    * 
-   * @static            Child class should override and call this method
-   *                    explicitly to fetch data, then create self instances for
-   *                    each record
+   * Note that `sanitize` method will not be called as this is a static method!
    * 
    * @return array      Returns an array of (associative) arrays containg
    *                    model(s) data whos keys correspond to fields of current
@@ -196,28 +198,31 @@ abstract class Model extends RelationalModel {
       throw new Exception("Cannot insert model! Incompaitable data passed!");
 
     global $database;
-    // Arrange the field names into proper SQL syntax
-    foreach (static::$fields as $field)
-    $fields[] = \sprintf("`%s`", $field);
+    $fields_defined = static::$fields; // Get all fields defined for current model
+    // If primary key is passed then add it as well
+    if ($primary_key) \array_unshift($fields_defined, static::$primary_col);
+    // INSERT INTO `table` (`field_1`, `field_2` ... `field_n`) VALUES ('value_1', 'value_2' ... 'value_n')
+    // Arrange the field names and values into proper SQL syntax
+    foreach ($fields_defined as $field) {
+      $fields[] = "`$field`";
+      $values[] = \sprintf("'%s'", gtsane($field, $data) ?? NULL);
+    }
+    // Merge all elements of array into a single string saperated by commas (,)
     $fields = \implode(", ", $fields);
-    
-    // Arrange the field values into proper SQL syntax
-    foreach ($data as $val)
-      $values[] = \sprintf('"%s"', $val);
     $values = \implode(", ", $values);
-
     // Execute the query and return the result
-    $query = $database->query(\sprintf("INSERT INTO `%s` (%s) VALUES (%s)", static::$table, $fields, $values));
-    return $query;
+    return $database->query(\sprintf("INSERT INTO `%s` (%s) VALUES (%s)", static::$table, $fields, $values));
   }
 
   /** 
    * =====================================================================
-   *    ABSTRACT METHODS
+   *    THE MOUNT METHOD
    * =====================================================================
    */
   /**
-   * Sets current object's corresponding property value to passed validated data.
+   * Sets current object's property to passed **validated** data's corresponding
+   * key.
+   * 
    * @param array $data   Raw data in an (associative) array whos element count
    *                      must be equal to the number of fields
    *                      (including primary key) and it's key name should be
@@ -226,8 +231,10 @@ abstract class Model extends RelationalModel {
    * @return void         Mounts data onto current model instance.
    */
   protected function mount(array $data): void {
+    // Set the value for primary key in `identifier` property
     $this->identifier  = gtsane(static::$primary_col, $data);
-    unset($data[static::$primary_col]);
+    unset($data[static::$primary_col]); // Remove primary key from passed data
+    // Set properties of current model identical to passed field names
     foreach($data as $field => $value)
       // Properties names will be identical to column names
       $this->{$field} = $value;
@@ -256,7 +263,7 @@ abstract class Model extends RelationalModel {
    * 
    * @param array $row          The (associative) array containing data of
    *                            current model's fields
-   * @param bool $ignore_pk     Ignores the primary key field existance check in
+   * @param bool $ignore_pk     Ignores the primary key field existence check in
    *                            passed data set
    * 
    * @return bool               Returns FALSE if number of elements in passed
@@ -269,12 +276,13 @@ abstract class Model extends RelationalModel {
    *                            
    */
   protected static function verify_fields(array $row, bool $ignore_pk = false): bool {
-    // Get all field names (including primary key) and match field count with elements in passed array
-    $fields = static::$fields;
+    $fields = static::$fields; // Get all field names defined for current model
+    // Add primary key at beginning of retrieved field names if `ignore_pk` is false
     if (! $ignore_pk) \array_unshift($fields, static::$primary_col);
+    // Number of elements in passed array should be equal to number of fields defined for current model (primary key exception)
     if (count($fields) != count($row)) return false;
 
-    // Each key name must correspond to model's field name!
+    // Each key name must correspond to model's field name (primary key exception)!
     foreach ($fields as $field)
       if (! insane($field, $row)) return false;
     return true; // Everything is fine :)

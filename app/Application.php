@@ -4,8 +4,8 @@ namespace app;
 require_once "Model.php";
 require_once "Shop.php";
 require_once "Car.php";
+use \Exception as Exception;
 use function utils\gtsane as gtsane;
-use function utils\dump as dump;
 
 class Application extends Model {
   protected static $table       = "applications";

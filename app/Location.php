@@ -4,7 +4,6 @@ namespace app;
 require_once "Model.php";
 require_once "Shop.php";
 use function utils\gtsane as gtsane;
-use function utils\dump   as dump;
 
 class Location extends Model {
   protected static $table       = "locations";

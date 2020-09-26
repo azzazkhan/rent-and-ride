@@ -5,7 +5,6 @@ require_once "Model.php";
 require_once "Shop.php";
 require_once "Application.php";
 use function utils\gtsane as gtsane;
-use function utils\dump   as dump;
 
 class Car extends Model {
   protected static $table       = "cars";

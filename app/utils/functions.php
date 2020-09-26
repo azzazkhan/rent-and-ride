@@ -71,11 +71,13 @@ function get_name_by_reflection(string $reference) {
  * tags. This function is created mainly for debugging purpose.
  * 
  * @param mixed $data       The data whos information is needed
+ * @param bool $die         Terminates the script if passed true
  * 
  * @return void             Prints the formatted result
  */
-function dump($data) {
+function dump($data, $die = false): void {
   print("<pre>\n");
     var_dump($data);
   print("</pre>\n");
+  if ($die) exit;
 }
