@@ -1,0 +1,167 @@
+.products-slider {
+  .owl-item {
+    display: inline-block !important;
+  }
+  .owl-nav,
+  .owl-dots {
+    display: none !important;
+  }
+  .card {
+    overflow: hidden;
+    display: block;
+    height: 380px;
+    width: 265px;
+    border: 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.4);
+    @include prefix(transition, (box-shadow 0.2s ease, transform 0.4s ease));
+    .fadeable {
+      opacity: 0;
+      @include prefix(transition, opacity 0.2s ease);
+    }
+    &.dark-light .background::after {
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    &.dark .background::after {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+    &.dark-heavy .background::after {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+    .background {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      background-size: cover;
+      @include prefix(transition, transform 0.4s ease);
+      &::after {
+        content: "";
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.2);
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0;
+        @include prefix(transition, opacity 0.4s ease);
+      }
+    }
+    &:hover {
+      & {
+        &.drop-shadow {
+          box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.6);
+        }
+        &.scale {
+          transform: scale(1.05);
+        }
+        &.bg-zoom .background {
+          transform: scale(1.1);
+        }
+        &.bg-blur {
+          .background {
+            filter: blur(1px);
+          }
+          &.hard .background {
+            filter: blur(2px);
+          }
+        }
+        &.bg-mask {
+          .background::after {
+            opacity: 1;
+          }
+        }
+      }
+      .popup {
+        @include prefix(transform, translateY(0px) !important);
+      }
+      .fadeable {
+        opacity: 1;
+      }
+    }
+    .content {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      font-family: get-font(heading);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: stretch;
+      padding: 60px 8px 0;
+      @include prefix(text-shadow, none !important);
+      .tags {
+        position: absolute;
+        top: 10px;
+        right: 2.5%;
+        left: 2.5%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-self: start;
+        a {
+          color: white;
+          background-color: #111111;
+          font-size: 12px;
+          line-height: 20px;
+          opacity: 0.8;
+          display: inline-block;
+          height: 20px;
+          padding: 0 8px;
+          margin-right: 4px;
+          border-radius: 4px;
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+      .popup {
+        @extend .no-select;
+        position: relative;
+        color: #1e1e1e;
+        background-color: white;
+        width: calc(100% + 8px * 2);
+        left: -8px;
+        min-height: 60%;
+        max-height: 100%;
+        overflow: hidden;
+        padding: 10px 8px 50px;
+        @include prefix(transform, translateY(100%));
+        @include prefix(transition, transform 0.2s ease);
+        .title {
+          font-size: 22px;
+        }
+        .details {
+          font-family: get-font(base);
+          font-size: 0.85rem !important;
+          margin-bottom: 20px;
+          .fa {
+            cursor: pointer;
+            top: -0.1em;
+            position: relative;
+            font-size: 0.8em;
+          }
+        }
+        .btn-action {
+          position: absolute;
+          color: white;
+          background-color: #1e1e1e;
+          bottom: 0;
+          left: 50%;
+          display: block;
+          width: 95%;
+          font-size: 0.95rem;
+          font-weight: bold;
+          line-height: 40px;
+          text-align: center;
+          height: 40px;
+          margin: 0 auto 10px;
+          border: 0;
+          border-radius: 4px;
+          @include prefix(transform, translateX(-50%));
+          @include prefix(transition, background-color 0.4s ease);
+        }
+      }
+    }
+  }
+}

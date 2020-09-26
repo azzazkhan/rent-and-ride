@@ -1,0 +1,31 @@
+.form.custom {
+  label {
+    font-weight: bold;
+  }
+  .form-control {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    &.is-invalid {
+      border-color: #dc3545 !important;
+    }
+    &:read-only,
+    &[readonly] {
+      @extend .no-select;
+      pointer-events: none;
+      background-color: rgba(0, 0, 0, 0.4) !important;
+      border: none !important;
+      @include prefix(box-shadow, none !important);
+    }
+    &:focus {
+      @include prefix(box-shadow, 0 0 0 2px get-color(primary));
+      &.is-valid {
+        @include prefix(box-shadow, 0 0 0 2px #28a745 !important);
+      }
+      &.is-invalid {
+        @include prefix(box-shadow, 0 0 0 2px #dc3545 !important);
+      }
+    }
+  }
+}

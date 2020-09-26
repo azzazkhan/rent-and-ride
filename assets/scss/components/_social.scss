@@ -1,0 +1,63 @@
+.social-icons-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  margin: 0 auto;
+  height: get-size(social-footer, height);
+  align-items: center;
+  justify-content: center;
+  &.circular .social-icon a {
+    border-radius: 50%;
+  }
+  .social-icon {
+    &.facebook a {
+      background-color: #3b5998;
+      &:hover {
+        box-shadow: 0 0 0 4px #333, 0 0 0 7px #3b5998;
+      }
+    }
+    &.twitter a {
+      background-color: #1da1f2;
+      &:hover {
+        box-shadow: 0 0 0 4px #333, 0 0 0 7px #1da1f2;
+      }
+    }
+    &.google a {
+      background-color: #dd4b39;
+      &:hover {
+        box-shadow: 0 0 0 4px #333, 0 0 0 7px #dd4b39;
+      }
+    }
+    &.instagram a {
+      background-color: #c13584;
+      &:hover {
+        box-shadow: 0 0 0 4px #333, 0 0 0 7px #c13584;
+      }
+    }
+    a {
+      background-color: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 60px;
+      width: 60px;
+      margin: 0 10px;
+      border: 2px solid transparent;
+      border-radius: 4px;
+      box-shadow: none;
+      @include prefix(transition, all 0.2s ease);
+      @include prefix(text-shadow, none !important);
+      &:hover {
+        color: white;
+      }
+      .fa {
+        font-size: get-size(header-social-icon, icon-size);
+      }
+    }
+    &:last-of-type a {
+      margin-right: 0;
+    }
+  }
+}

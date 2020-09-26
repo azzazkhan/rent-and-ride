@@ -1,0 +1,21 @@
+# Disable directory indexing
+Options -Indexes
+
+RewriteEngine on
+RewriteBase /
+# PHP files can be accessed without extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L,QSA]
+
+# Don't apply any rules on index file
+RewriteRule ^index\.php$ - [L]
+
+# Adding dynamic URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^booking$ /index.php?show=booking-form [NC]
+RewriteRule ^booking/submit$ /scripts/booking.php [NC]
+RewriteRule ^services$ /index.php?show=services [NC]
+RewriteRule ^location/(.*)/(.*)$ /index.php?show=shop&location=$1&shop=$2 [L,NC]
+RewriteRule ^location/(.*)$ /index.php?show=location&location=$1 [NC]

@@ -1,0 +1,11 @@
+footer {
+  background-color: get-color(faded-dark);
+  font-size: 0.8em;
+  display: flex;
+  height: get-size(footer, height);
+  align-items: center;
+  @include breakpoint(md) {
+    font-size: 1em;
+    justify-content: center;
+  }
+}

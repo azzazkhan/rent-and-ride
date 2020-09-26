@@ -1,0 +1,73 @@
+$sm: 520px;
+$md: 768px;
+$lg: 1200px;
+$xl: 1600px;
+
+@mixin breakpoint($size: $lg) {
+  @if $size == xs {
+    @media (max-width: $sm) {
+      @content;
+    }
+  } @else if $size == sm {
+    @media (min-width: $sm) {
+      @content;
+    }
+  } @else if $size == md {
+    @media (min-width: $md) {
+      @content;
+    }
+  } @else if $size == lg {
+    @media only screen and (min-width: $lg) {
+      @content;
+    }
+  } @else if $size == xl {
+    @media only screen and (min-width: $xl) {
+      @content;
+    }
+  } @else {
+    @media only screen and (min-width: #{$size}) {
+      @content;
+    }
+  }
+}
+
+@mixin placeholder {
+  &::-webkit-input-placeholder,
+  &::-moz-placeholder,
+  &:-ms-input-placeholder &:-moz-placeholder {
+    @content;
+  }
+}
+
+@mixin prefix($property, $value) {
+  -webkit-#{$property}: $value;
+  -moz-#{$property}: $value;
+  #{$property}: $value;
+}
+
+@function shade($color, $percent) {
+  @return mix(#000000, $color, $percent);
+}
+@function tint($color, $percent) {
+  @return mix(#ffffff, $color, $percent);
+}
+
+@function get-size($elem, $prop) {
+  @return map-get(map-get($sizing, $elem), $prop);
+}
+
+@function get-index($elem) {
+  @return map-get($z-index, $elem);
+}
+
+@function get-color($color) {
+  @return map-get($colors, $color);
+}
+
+@function get-font($context) {
+  @return map-get($font-families, $context);
+}
+
+@function get-font-size($context) {
+  @return map-get($font-sizes, $context);
+}

@@ -1,0 +1,39 @@
+// The dropdown can't be aligned because it's style is override by bootstrap JS.
+.dropdown-menu.custom {
+  background-color: get-color(secondary);
+  width: calc(100% - 60px);
+  padding: 15px 0;
+  &.dropdown-menu-right::before {
+    left: auto;
+    right: 17.5px;
+  }
+  &.dropdown-menu-center::before {
+    left: 50%;
+    right: auto;
+    @include prefix(transform, translateX(-50%) rotate(45deg));
+  }
+  &::before {
+    content: "";
+    background-color: get-color(secondary);
+    height: 20px;
+    width: 20px;
+    display: block;
+    position: absolute;
+    top: -10px;
+    left: 17.5px;
+    @include prefix(transform, rotate(45deg));
+  }
+  a {
+    color: white;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 2px;
+    @include prefix(text-shadow, none !important);
+    @include prefix(transition, (color 0.2s ease, background-color 0.2 ease));
+    &:hover {
+      color: white;
+      background-color: shade(get-color(primary), 30%);
+      font-weight: bolder;
+    }
+  }
+}

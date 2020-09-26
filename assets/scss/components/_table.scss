@@ -1,0 +1,31 @@
+.table.custom {
+  thead.thead-primary {
+    background-color: get-color(primary);
+  }
+  &.hoverable tr {
+    border-radius: 0.25rem !important;
+    td {
+      &:first-of-type {
+        border-top-left-radius: 0.25rem !important;
+        border-bottom-left-radius: 0.25rem !important;
+      }
+      &:last-of-type {
+        border-top-right-radius: 0.25rem !important;
+        border-bottom-right-radius: 0.25rem !important;
+      }
+    }
+    @include prefix(
+      transition,
+      (background-color 0.2s ease, box-shadow 0.2s ease)
+    );
+    &:hover:not(.no-decor) {
+      background-color: rgba(255, 255, 255, 0.4);
+      @include prefix(text-shadow, none !important);
+      @include prefix(box-shadow, 0 0 10px -0.25rem rgba(0, 0, 0, 0.2));
+      &,
+      a {
+        color: shade(get-color(primary), 35%) !important;
+      }
+    }
+  }
+}

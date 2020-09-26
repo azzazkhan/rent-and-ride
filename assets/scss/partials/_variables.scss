@@ -1,0 +1,63 @@
+$z-index: (
+  background: 2,
+  content: 30,
+);
+
+$sizing: (
+  spacer: (
+    height: 25px,
+  ),
+  header: (
+    height: 82px,
+    height-mobile: 82px * 1.5,
+  ),
+  header-social-icon: (
+    height: 40px,
+    margin-right: 10px,
+    icon-size: 20px,
+  ),
+  button: (
+    height: 50px,
+    height-xl: 60px,
+  ),
+  footer: (
+    height: 50px,
+  ),
+  social-footer: (
+    height: 120px,
+  ),
+);
+
+$colors: (
+  // primary-light: #a4cb97, - 65% opacity
+  primary: #a4cb97,
+  secondary: #242121,
+  // Buttons have 70% opacity
+  background: #cbc7c7,
+  faded: #f9f8f7,
+  faded-dark: #343a40,
+  base-text: #ffffff
+);
+
+$font-families: (
+  base: (
+    "Lato",
+    sans-serif,
+  ),
+  heading: (
+    "Open Sans",
+    sans-serif,
+  ),
+  featured: (
+    "Lora",
+    serif,
+  ),
+  featured-2: (
+    "Oleo Script",
+    cursive,
+  ),
+);
+
+$font-sizes: (
+  base: 16px,
+);

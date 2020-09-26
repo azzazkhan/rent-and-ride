@@ -1,0 +1,67 @@
+.selection-box {
+  margin-bottom: 50px;
+  .btn {
+    margin-bottom: 30px;
+  }
+  .box {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    height: 300px;
+    width: 90%;
+    margin: 0 auto;
+    border-radius: 10px;
+    @include prefix(transition, (transform 0.2s ease, box-shadow 0.2s ease));
+    @include breakpoint(lg) {
+      height: 380px;
+    }
+    @include breakpoint(xl) {
+      height: 500px;
+    }
+    &:active {
+      @include prefix(transform, scale(0.96));
+      @include breakpoint(lg) {
+        @include prefix(transform, scale(1.05));
+      }
+    }
+    @include breakpoint(lg) {
+      &:hover {
+        @include prefix(transform, scale(1.05));
+      }
+    }
+    .title {
+      background-color: fade-out($color: get-color(primary), $amount: 0.3);
+      font-size: 1.05em;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+      display: inline-block;
+      width: 80%;
+      margin: 20px auto 0;
+      padding: 12.5px 10px;
+      border-radius: 50px;
+      @include prefix(text-shadow, none !important);
+      @include breakpoint(xl) {
+        font-size: 1.3em;
+        padding: 15px 10px;
+      }
+    }
+    &.watermarked::after {
+      content: "";
+      position: absolute;
+      background-image: url("../images/logo.png");
+      background-size: cover;
+      top: 50%;
+      left: 50%;
+      display: block;
+      height: 80px;
+      width: 80px;
+      border-radius: 50%;
+      @include prefix(transform, translate(-50%, -50%));
+    }
+  }
+}

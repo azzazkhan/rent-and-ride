@@ -1,0 +1,82 @@
+* {
+  &,
+  &::before,
+  &::after {
+    @include prefix(box-sizing, border-box);
+    outline: none !important;
+  }
+}
+
+body {
+  color: get-color(base-text);
+  background-color: get-color(background);
+  overflow-x: hidden;
+  font-family: get-font(base);
+  font-size: get-font-size(base);
+  line-height: 1.4em;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  &.scroll-locked {
+    overflow-y: hidden !important;
+  }
+}
+
+a {
+  &,
+  &:hover,
+  &:focus,
+  &:active,
+  &:visited {
+    color: get-color(base-text);
+    text-decoration: none;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+.heading,
+.heading-1,
+.heading-2,
+.heading-3,
+.heading-4,
+.heading-5,
+.heading-6 {
+  &.light {
+    font-weight: 300 !important;
+  }
+  &.regular {
+    font-weight: 400 !important;
+  }
+  &.black {
+    font-weight: 900 !important;
+  }
+  font-family: get-font(heading);
+  font-weight: bold;
+}
+
+.featured {
+  font-family: get-font(featured) !important;
+}
+
+.featured-2 {
+  font-family: get-font(featured-2) !important;
+  font-weight: 400 !important;
+}
+
+ul,
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

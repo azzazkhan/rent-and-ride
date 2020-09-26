@@ -10,6 +10,3 @@ use app\Location        as Location;
 use app\Shop            as Shop;
 use app\Car             as Car;
 use app\Application     as Application;
-
-$car = new Shop("toyota-motors", [new Location(2)]);
-dump($car);

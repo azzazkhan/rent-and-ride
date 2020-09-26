@@ -1,0 +1,114 @@
+.btn.custom {
+  position: relative;
+  color: black;
+  background-color: white;
+  display: inline-flex;
+  height: get-size(button, height);
+  justify-content: center;
+  align-items: center;
+  padding: 0 50px;
+  border: 0;
+  box-shadow: none;
+  border-radius: 6px;
+  @include prefix(transition, (color 0.2s ease, background 0.2s ease));
+  @include breakpoint(xl) {
+    font-size: 1.15em;
+    height: get-size(button, height-xl);
+  }
+  &.wide {
+    padding: 0 100px;
+  }
+  &.wider {
+    padding: 0 150px;
+  }
+  &.bold {
+    letter-spacing: 0.085em !important;
+    font-weight: bold;
+    @include breakpoint(lg) {
+      border-width: 3px !important;
+    }
+    @include breakpoint(xl) {
+      font-weight: bolder;
+      &.invert {
+        border-width: 4px;
+      }
+    }
+  }
+  &.pilled {
+    border-radius: get-size(button, height);
+  }
+  // Color schemes
+  &.primary {
+    color: get-color(base-text);
+    background-color: get-color(primary);
+    border-color: get-color(primary) !important;
+  }
+  &.secondary {
+    color: get-color(base-text);
+    background-color: get-color(secondary);
+    border-color: get-color(secondary) !important;
+  }
+  // Transparent background animation
+  &.invert {
+    border: 2px solid white;
+    &:hover {
+      color: white;
+      background: transparent !important;
+      &:not(.no-color-invert) {
+        &.primary {
+          color: get-color(primary);
+        }
+        &.secondary {
+          color: get-color(secondary);
+        }
+      }
+    }
+  }
+  // Fade background animation
+  &.fadeable:hover {
+    &.primary {
+      background-color: fade-out($color: get-color(primary), $amount: 0.2);
+    }
+    &.secondary {
+      background-color: fade-out($color: get-color(secondary), $amount: 0.2);
+    }
+  }
+  &.has-icon {
+    padding-left: 70px;
+    padding-right: 50px;
+    .icon {
+      position: absolute;
+      left: 7.5px;
+      top: 50%;
+      display: block;
+      height: 40px;
+      width: 40px;
+      @include prefix(transform, translateY(-50%));
+      @include breakpoint(xl) {
+        height: 45px;
+        width: 45px;
+        left: 10px;
+      }
+    }
+  }
+  .icon {
+    display: none;
+  }
+  &.dropdown-toggle {
+    &[aria-expanded="true"]::after {
+      @include prefix(transform, translateY(2px) rotate(180deg));
+    }
+    &::after {
+      content: "\f078";
+      font-family: "FontAwesome";
+      font-size: 0.75em;
+      margin: 0 0 0 10px;
+      vertical-align: middle;
+      border: 0;
+      height: 1em;
+      line-height: 1em;
+      @include prefix(transform, translateY(2px));
+      @include prefix(transition, transform 0.2s ease);
+    }
+  }
+}

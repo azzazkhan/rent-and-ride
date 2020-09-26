@@ -1,0 +1,88 @@
+header {
+  position: relative;
+  background-color: get-color(primary);
+  display: flex;
+  height: get-size(header, height-mobile);
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 10px;
+  border-bottom: 1px solid shade(get-color(primary), 5%);
+  @include prefix(box-shadow, 0 -10px 30px rgba(0, 0, 0, 0.4));
+  @include breakpoint(lg) {
+    height: get-size(header, height);
+    padding: 0;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+  .logo-wrapper {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    left: 50%;
+    text-align: center;
+    @include prefix(transform, translateX(-50%));
+    @include breakpoint(lg) {
+      width: unset;
+      top: calc(50% - 5px);
+      @include prefix(transform, translate(-50%, -50%));
+    }
+  }
+  .social-icons-list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 20px;
+    .social-item {
+      &.facebook a {
+        color: #3b5998;
+        &:hover {
+          background-color: #3b5998;
+          // box-shadow: 0 0 0 2px get-color(primary), 0 0 0 4px #3b5998;
+        }
+      }
+      &.twitter a {
+        color: #1da1f2;
+        &:hover {
+          background-color: #1da1f2;
+          // box-shadow: 0 0 0 2px get-color(primary), 0 0 0 4px #1da1f2;
+        }
+      }
+      &.google a {
+        color: #dd4b39;
+        &:hover {
+          background-color: #dd4b39;
+          // box-shadow: 0 0 0 2px get-color(primary), 0 0 0 4px #dd4b39;
+        }
+      }
+      &.instagram a {
+        color: #c13584;
+        &:hover {
+          background-color: #c13584;
+          // box-shadow: 0 0 0 2px get-color(primary), 0 0 0 4px #c13584;
+        }
+      }
+      a {
+        background-color: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: get-size(header-social-icon, height);
+        width: get-size(header-social-icon, height);
+        margin-right: get-size(header-social-icon, margin-right);
+        border: 2px solid transparent;
+        border-radius: 4px;
+        box-shadow: none;
+        @include prefix(transition, all 0.2s ease);
+        &:hover {
+          color: white;
+        }
+        .fa {
+          font-size: get-size(header-social-icon, icon-size);
+        }
+      }
+      &:last-of-type a {
+        margin-right: 0;
+      }
+    }
+  }
+}
