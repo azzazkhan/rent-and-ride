@@ -5,8 +5,6 @@ require_once "Database.php";
 
 use \Exception;
 use function utils\get_name_by_reflection as get_name_by_reflection;
-// use function utils\insane                 as insane;
-use function utils\dump                   as dump;
 
 class RelationalModel {
   protected static $indexes     = array(); // Foreign indexes/keys
@@ -20,9 +18,8 @@ class RelationalModel {
       foreach (static::$dependables as $dependency) {
         $parent_ids = $this->get_parent_ids($dependency);
         if (count($parent_ids) == 0) break;
-        foreach ($parent_ids as $id) {
+        foreach ($parent_ids as $id)
           $models[] = new $dependency($id);
-        }
         $class = get_name_by_reflection($dependency);
         $instances[$class] = $models;
       }
@@ -41,7 +38,7 @@ class RelationalModel {
   private function get_parent_ids($model) {
     global $database;
     $query = $database->query(\sprintf("SELECT `%s` FROM `%s` WHERE `%s` = %s", $model::$primary_col, static::$pivot, static::$primary_col, $this->id()));
-    if ($query->num_rows == 0) return false;
+    if ($query->num_rows == 0) return [];
     foreach ($query->fetch_all(MYSQLI_NUM) as $row)
       $ids[] = $row[0];
     return $ids;
@@ -65,7 +62,7 @@ class RelationalModel {
     // `address` = 'peshawar-motors' AND `location_id` = 1
     $composite_uniques = $this->composite_uniques(true);
     foreach ($composite_uniques as $unique_index) {
-      $clause = [];
+      $clause = []; // Reset to an empty array for each iteration
       $clause[] = \sprintf("`%s` = '%s'", $unique_index, $reference);
       foreach ($models as $model)
         $clause[] = \sprintf("`%s` = '%s'", $model::$primary_col, $model->id());
@@ -86,7 +83,6 @@ class RelationalModel {
     if (self::has_pivot_table()) {
       $referenced_ids = self::get_relational_ids($models);
       if (count($referenced_ids) == 0) return [];
-      $conditional_query = [];
       foreach ($referenced_ids as $id)
         $conditional_query[] = \sprintf('%s', $id);
       $conditional_query = \implode(", ", $conditional_query);

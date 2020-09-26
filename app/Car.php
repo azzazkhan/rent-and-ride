@@ -22,18 +22,6 @@ class Car extends Model {
   public           $shops; // Blongs to many shops
   public           $applications; // Has many applications
 
-  /**
-   * @abstract                Abstract overriden method of parent `Models` class
-   */
-  protected function mount(array $data): void {
-    $this->identifier     = gtsane(static::$primary_col, $data);
-    $this->name           = gtsane("name", $data);
-    $this->specifications = gtsane("specifications", $data) ?? NULL;
-    $this->daily_price    = gtsane("daily_price", $data) ?? NULL;
-    $this->weekly_price   = gtsane("weekly_price", $data) ?? NULL;
-    $this->slug           = gtsane("slug", $data);
-    $this->tags           = gtsane("tags", $data) ?? NULL;
-  }
 
   public function load_relatables() {
     $relatables = parent::load_relatables();

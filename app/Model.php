@@ -5,9 +5,10 @@ require_once "utils/functions.php";
 require_once "Database.php";
 require_once "RelationalModal.php";
 
-use \Exception                            as Exception;
-use function utils\insane                 as insane;
-use function utils\dump                   as dump;
+use \Exception            as Exception;
+use function utils\insane as insane;
+use function utils\gtsane as gtsane;
+use function utils\dump   as dump;
 
 abstract class Model extends RelationalModel {
   protected        $identifier; // Primary key (set by `mount` method)
@@ -217,9 +218,6 @@ abstract class Model extends RelationalModel {
    */
   /**
    * Sets current object's corresponding property value to passed validated data.
-   * @abstract mount      Must need to be explicitly defined in child class
-   *                      because each model have independent and different
-   *                      publically accessible properties
    * @param array $data   Raw data in an (associative) array whos element count
    *                      must be equal to the number of fields
    *                      (including primary key) and it's key name should be
@@ -227,7 +225,13 @@ abstract class Model extends RelationalModel {
    * 
    * @return void         Mounts data onto current model instance.
    */
-  abstract protected function mount(array $data): void;
+  protected function mount(array $data): void {
+    $this->identifier  = gtsane(static::$primary_col, $data);
+    unset($data[static::$primary_col]);
+    foreach($data as $field => $value)
+      // Properties names will be identical to column names
+      $this->{$field} = $value;
+  }
   
   /** 
    * =====================================================================
@@ -252,6 +256,9 @@ abstract class Model extends RelationalModel {
    * 
    * @param array $row          The (associative) array containing data of
    *                            current model's fields
+   * @param bool $ignore_pk     Ignores the primary key field existance check in
+   *                            passed data set
+   * 
    * @return bool               Returns FALSE if number of elements in passed
    *                            array are not equal to the number of fields or
    *                            if the keys of passed array does not match with
@@ -363,7 +370,8 @@ abstract class Model extends RelationalModel {
    * This method runs at very beginning (after the constructor method) and make
    * sures that there's no errors is explicitly defined fields for current model.
    * 
-   *! Note: This method is not invoked a static method is called on current object!
+   *! Note: This method is not invoked when static method is called on current
+   *! class!
    * 
    * @return void
    * @throws Exception              Throws an exception if found anything that's

@@ -20,20 +20,27 @@ class Application extends Model {
   public           $shop; // Blongs to one location
   public           $car; // Belongs to one car
 
-  /**
-   * @abstract                Abstract overriden method of parent `Models` class
-   */
+  
   protected function mount(array $data): void {
-    $this->identifier   = gtsane(static::$primary_col, $data);
-    $this->name         = gtsane("name", $data);
-    $this->email        = gtsane("email", $data) ?? NULL;
-    $this->contact      = gtsane("contact", $data);
-    $this->nic_number   = gtsane("nic_number", $data);
-    $this->address      = gtsane("address", $data);
-    $this->car_id       = gtsane("car_id", $data);
-    $this->shop_id      = gtsane("shop_id", $data);
-    // Submission date timestamp
-    $this->submitted_at = !\is_null(gtsane("submitted_at", $data)) ? (\strtotime(gtsane("submitted_at", $data))) : NULL;
+    $this->identifier = gtsane(static::$primary_col, $data);
+    unset($data[static::$primary_col]);
+    foreach($data as $field => $value){
+      if ($field == "submitted_at") {
+        // Submission date timestamp
+        $this->submitted_at = !\is_null(gtsane("submitted_at", $data)) ? (\strtotime(gtsane("submitted_at", $data))) : NULL;
+      break;
+      }
+      $this->{$field} = $value;
+    }
+  }
+
+  public static function create(array $data, bool $primary_key = false) {
+    // Check if all fields are specified in passed data
+    if (! static::verify_fields($data, !$primary_key))
+      throw new Exception("Cannot insert model! Incompaitable data passed!");
+    
+    $data["submitted_at"] = date("Y-m-d H:i:s");
+    return parent::create($data, $primary_key);
   }
 
   public function load_dependables() {

@@ -14,14 +14,6 @@ class Location extends Model {
   public static    $fields      = array("name", "slug");
   public           $shops       = array(); // Has many shops
 
-  /**
-   * @abstract                Abstract overriden method of parent `Models` class
-   */
-  protected function mount(array $data): void {
-    $this->identifier = gtsane(static::$primary_col, $data);
-    $this->name       = gtsane("name", $data);
-    $this->slug       = gtsane("slug", $data);
-  }
 
   public function load_relatables() {
     $relatables = parent::load_relatables();
