@@ -17,5 +17,5 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^booking$ /controllers/Booking.php [NC]
 RewriteRule ^booking/submit$ /controllers/Booking.php?action=create [NC]
 RewriteRule ^services$ /controllers/Services.php [NC]
-RewriteRule ^location/(.*)/(.*)$ /controllers/Shop.php?location=$1&shop=$2 [L,NC]
+RewriteRule ^location/(.*)/(.*)$ /controllers/Shop.php?location=$1&shop=$2 [NC]
 RewriteRule ^location/(.*)$ /controllers/Location.php?location=$1 [NC]
