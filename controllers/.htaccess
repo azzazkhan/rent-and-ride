@@ -1,0 +1,2 @@
+# Prevent direct access of files in this directory
+IndexIgnore *
