@@ -12,55 +12,113 @@ class RelationalModel {
   protected static $dependables = array(); // Belongs to one/many
   protected static $pivot; // Pivot table (if belongs to many)
 
+  /**
+   * Loads parent model(s) for current model and mounts them onto current object's
+   * instance
+   * 
+   * @return array                  Returns an associative array of numeric arrays
+   *                                whos keys are identical to parent model names
+   */
   public function load_dependables() {
     if (! $this->has_dependables()) return; // No relations defined
-    if (self::has_pivot_table()) {
+    if (self::has_pivot_table()) { // Relations are defined in pivot table
+      // Loop over each dependency
       foreach (static::$dependables as $dependency) {
+        // Load parent IDs for current model from the pivot table
         $parent_ids = $this->get_parent_ids($dependency);
-        if (count($parent_ids) == 0) break;
+        // No parent record for current model
+        if (count($parent_ids) == 0) $models = [];
         foreach ($parent_ids as $id)
+          // Create a new instance of parent model
           $models[] = new $dependency($id);
         $class = get_name_by_reflection($dependency);
+        // Use key name identical to parent model's class name, e.g "Shop"
         $instances[$class] = $models;
       }
+      // array("Parent1" => [..., ..., ...], "Parent2" => [..., ..., ...])
       return $instances;
     }
+    // Current model has single parent model(s)
     foreach(static::$dependables as $dependency) {
       // Fetch short class name by model reference
       $class = get_name_by_reflection($dependency);
+      // Parent ID is already defined as a foreign index in current model's fields, the property names are identical to field names
       $instances[$class] = new $dependency(
         $this->{$dependency::$primary_col}
       );
     }
+    // array("Location" => Location(...), "Zone" => Zone(...))
     return $instances;
   }
 
+  /**
+   * This method fetchs primary keys for passed model against current model's
+   * primary key
+   * 
+   * @param Model $model            Parent model whos IDs are to be fetched
+   * 
+   * @return array                  An array of fetched parent IDs
+   */
   private function get_parent_ids($model) {
     global $database;
+    // SELECT `parent_id` FROM `pivot_table` WHERE `model_id` = n
     $query = $database->query(\sprintf("SELECT `%s` FROM `%s` WHERE `%s` = %s", $model::$primary_col, static::$pivot, static::$primary_col, $this->id()));
+    // Return an empty array if no records were found
     if ($query->num_rows == 0) return [];
+    // MySQL return an array of numeric array whos first element is the ID
     foreach ($query->fetch_all(MYSQLI_NUM) as $row)
+      // Create a new array with IDs as direct element of it
       $ids[] = $row[0];
-    return $ids;
+    // array(1, 2, 3, 4, ..., n)
+    return $ids; // Return the filtered array
   }
 
+  /**
+   * This method loads child models for current model against current model's
+   * primary key
+   * 
+   * @return array                  Returns an associative array of numeric arrays
+   *                                whos keys are identical to child model's class
+   *                                name
+   */
   public function load_relatables() {
     if (! $this->has_relatables()) return; // No relations defined
     foreach ($this->relatables as $relatable) {
+      // Get a suitable name
       $class = get_name_by_reflection($relatable);
+      // Get all child models with reference to current model
       $instances[$class] = $relatable::referenced([$this]);
     }
+    // array("Child1" => [..., ..., ...], "Child2" => [..., ..., ...])
     return $instances;
   }
 
-  protected function unique_by_reference(string $reference, array $models) {
+  /**
+   * Fetchs unique (single) record based on passed reference key and models for
+   * current model (composite unique index specified)
+   * 
+   * @param string $reference       The key to search for
+   * @param array $models           The model to combine composite unique indexes
+   *                                with
+   * 
+   * @return array                  Returns an associative array if record was
+   *                                found for passed reference keyword and model
+   *                                else an empty array
+   * @throws Exception              Throws an exception if passed refrence models
+   *                                are not defined as a dependency for current
+   *                                model or no reference models are passed
+   */
+  protected function unique_by_reference(string $reference, array $models): array {
+    // Check if passed models are defined as dependencies of current model
     $models = self::check_dependables($models);
     if (! $models || count($models) == 0)
       throw new Exception("Invalid reference passed to search through composite unique index!");
     global $database;
-    // `slug`    = 'frontier-motors' AND `location_id` = 1 OR
-    // `address` = 'peshawar-motors' AND `location_id` = 1
+    // Get all composite unqiue indexes names with initial (@) symbol stripped
     $composite_uniques = $this->composite_uniques(true);
+    // SELECT * FROM `shops` WHERE
+    // `slug`    = 'frontier-motors' AND `location_id` = 1 OR
+    // `address` = 'frontier-motors' AND `location_id` = 1
     foreach ($composite_uniques as $unique_index) {
       $clause = []; // Reset to an empty array for each iteration
       $clause[] = \sprintf("`%s` = '%s'", $unique_index, $reference);
@@ -69,7 +127,10 @@ class RelationalModel {
       $conditional_query[] = \implode(" AND ", $clause);
     }
     $query = $database->query(\sprintf("SELECT * FROM `%s` WHERE %s LIMIT 1", static::$table, \implode(" OR ", $conditional_query)));
-    return $query->num_rows > 0 ? $query->fetch_assoc() : [];
+    // Terminate the script if no records were found (cannot instantiate)
+    if ($query->num_rows == 0)
+      die(\sprintf("No record found for current model against passed search keyword (%s)", $reference));
+    return $query->fetch_assoc(); // Return the fetched (raw) data
   }
 
   public static function referenced(array $models): array {
@@ -167,7 +228,7 @@ class RelationalModel {
    *                              inside the relatables then an exception will be
    *                              thrown
    */
-  protected function has_relatables(): bool {    
+  protected function has_relatables(): bool {
     return count($this->relatables) == 0 ? false : true;
   }
   
