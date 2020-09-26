@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 10, 2020 at 04:23 PM
--- Server version: 10.4.14-MariaDB
--- PHP Version: 7.4.9
+-- Generation Time: Sep 26, 2020 at 07:46 PM
+-- Server version: 10.4.13-MariaDB
+-- PHP Version: 7.4.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -36,16 +36,8 @@ CREATE TABLE `applications` (
   `address` text NOT NULL,
   `car_id` int(11) UNSIGNED NOT NULL,
   `shop_id` int(11) UNSIGNED NOT NULL,
-  `submited_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `applications`
---
-
-INSERT INTO `applications` (`app_id`, `name`, `email`, `contact`, `nic_number`, `address`, `car_id`, `shop_id`, `submited_at`) VALUES
-(2, 'Azzaz Khan', 'students.mails9@gmail.com', '03369596578', '34202-4551234-1', 'House D-10, Muslim City colony, Tarnab Farm, Peshawar', 1, 3, '2020-09-07 20:33:14'),
-(3, 'Azzaz Khan', 'students.mails9@gmail.com', '03369596578', '34202-4551234-1', 'House D-10, Muslim City colony, Tarnab Farm, Peshawar', 2, 3, '2020-09-07 20:33:14');
 
 -- --------------------------------------------------------
 
@@ -198,7 +190,7 @@ ALTER TABLE `shops`
 -- AUTO_INCREMENT for table `applications`
 --
 ALTER TABLE `applications`
-  MODIFY `app_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `app_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `cars`
@@ -210,7 +202,7 @@ ALTER TABLE `cars`
 -- AUTO_INCREMENT for table `car_shop`
 --
 ALTER TABLE `car_shop`
-  MODIFY `relation_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `relation_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `locations`
@@ -222,7 +214,7 @@ ALTER TABLE `locations`
 -- AUTO_INCREMENT for table `shops`
 --
 ALTER TABLE `shops`
-  MODIFY `shop_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `shop_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

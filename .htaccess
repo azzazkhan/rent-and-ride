@@ -14,8 +14,8 @@ RewriteRule ^index\.php$ - [L]
 # Adding dynamic URLs
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^booking$ /index.php?show=booking-form [NC]
-RewriteRule ^booking/submit$ /scripts/booking.php [NC]
-RewriteRule ^services$ /index.php?show=services [NC]
-RewriteRule ^location/(.*)/(.*)$ /index.php?show=shop&location=$1&shop=$2 [L,NC]
-RewriteRule ^location/(.*)$ /index.php?show=location&location=$1 [NC]
+RewriteRule ^booking$ /controllers/Booking.php [NC]
+RewriteRule ^booking/submit$ /controllers/Booking.php?action=create [NC]
+RewriteRule ^services$ /controllers/Services.php [NC]
+RewriteRule ^location/(.*)/(.*)$ /controllers/Shop.php?location=$1&shop=$2 [L,NC]
+RewriteRule ^location/(.*)$ /controllers/Location.php?location=$1 [NC]

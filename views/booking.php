@@ -107,7 +107,6 @@
                 maxlength="50"
                 aria-describedby="customerNameFeedback"
                 placeholder="Enter your full name"
-                value="Azzaz Khan"
                 autocomplete="off"
                 required
               />
@@ -124,7 +123,6 @@
                 maxlength="100"
                 aria-describedby="customerEmailFeedback"
                 placeholder="Enter your email address"
-                value="students.mails9@gmail.com"
               />
               <div class="feedback"></div>
             </div>
@@ -139,9 +137,9 @@
                 maxlength="11"
                 aria-describedby="customerContactFeedback"
                 placeholder="Enter your contact number"
-                value="03369596578"
                 required
               />
+              <div class="feedback"></div>
             </div>
             <div class="form-group customer-nicn">
               <label for="customerNICN">National Identity Card (NIC)</label>
@@ -154,10 +152,9 @@
                 maxlength="15"
                 aria-describedby="customerNICNFeedback"
                 placeholder="Enter your NIC number"
-                value="34202-4551234-1"
                 required
               />
-              <div class="feedback">asdasdads</div>
+              <div class="feedback"></div>
               <small id="customerNICNFeedback" class="form-text text-muted"
                 >We'll never share your personal data with others.</small
               >
@@ -174,11 +171,11 @@
                 aria-describedby="customerAddressFeedback"
                 placeholder="Enter your address"
                 required
-              >House D-10, Muslim City colony, Tarnab Farm, Peshawar</textarea>
+              ></textarea>
               <div class="feedback"></div>
             </div>
-            <input type="hidden" name="car_id" value="<?= $car->primary_key() ?>">
-            <input type="hidden" name="shop_id" value="<?= $shop->primary_key() ?>">
+            <input type="hidden" name="car_id" value="<?= $car->id() ?>">
+            <input type="hidden" name="shop_id" value="<?= $shop->id() ?>">
             <button
               type="submit"
               class="btn btn-block custom primary bold rounded mt-2"

@@ -1,5 +1,4 @@
 jQuery(document).ready(function ($) {
-  run_validations();
   $("#bookingForm").on("submit", function (e) {
     run_validations(e);
   });

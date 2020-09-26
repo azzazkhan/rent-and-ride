@@ -148,7 +148,7 @@
               </div>
               <form action="/booking" method="post">
                 <input type="hidden" name="car_name" value="<?= $car->slug ?>">
-                <input type="hidden" name="shop_id" value="<?= $this->shop->primary_key() ?>">
+                <input type="hidden" name="shop_id" value="<?= $this->shop->id() ?>">
                 <button class="btn-action">Book Now</button>
               </form>
             </div>
