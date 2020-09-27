@@ -1,8 +1,9 @@
 <?php
+  // Default title value, in case title is not passed or template is loaded statically
   $title = "Rent and Ride &mdash; Chalo Safar Karain";
   if (isset($this)) { // Prevent errors for direct rendering function
-    if (is_string($this->title))
-      $title = $this->title;
+    // If title is passed then use that title else use default title value
+    $title = \is_string($this->title) && \strlen($this->title) > 0 ? $this->title : $title;
   }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -24,7 +25,7 @@
     <link rel="stylesheet" href="/assets/css/normalize.min.css" />
     <link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
     <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/assets/css/style.css?v=<?= hash("crc32b", microtime());?>" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?= hash("crc32b", microtime()) ?>" />
     <script src="/assets/js/jquery.min.js"></script>
   </head>
   <body>
