@@ -22,33 +22,36 @@ class Shop extends Model {
   public           $cars         = array(); // Has many cars
   public           $applications = array(); // Has many applications
 
-  /**
-   * @abstract                Abstract overriden method of parent `Models` class
-   */
-
+  // Overriden method, needed to store child model(s) in custom local property
   public function load_relatables() {
+    // Load child model(s) instances
     $relatables = parent::load_relatables();
+    // Store them in local properties
     $this->cars = gtsane("Car", $relatables);
     $this->applications = gtsane("Application", $relatables);
   }
 
+  // Overriden method, needed to store parent model(s) in custom local property
   public function load_dependables() {
+    // Load parent model(s) instances
     $dependencies = parent::load_dependables();
+    // Store them in local properties
     $this->location = gtsane("Location", $dependencies);
   }
 
+  // Overriden method, needed to create self instance for each record
   public static function referenced(array $models): array {
-    $data = parent::referenced($models);
+    $data = parent::referenced($models); // Fetch raw data from database
+    // Return an empty array if no records were found
     if (count($data) == 0) return [];
-    $instances = [];
-    foreach($data as $row)
-      $instances[] = new self($row);
-    return $instances;
+    // Create a new instance of self and mount the data on it
+    foreach($data as $row) $instances[] = new self($row);
+    return $instances; // Return the created instances in an array
   }
 
   // Overriden method, needed to create self instance for each record
   public static function all(): array {
-    $rows = parent::all(); // Fetch records from database
+    $rows = parent::all(); // Fetch raw data from database
     // Return an empty array if no records were found
     if (count($rows) == 0 || empty($rows) || \is_null($rows)) return [];
     // Create a new instance of self and mount the data on it

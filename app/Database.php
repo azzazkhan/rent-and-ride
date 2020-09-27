@@ -1,7 +1,7 @@
 <?php
 namespace app;
 
-// Force PHP to report all errors
+// Force PHP to report all errors, remove these lines in product mode!
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
