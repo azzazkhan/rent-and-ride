@@ -4,13 +4,10 @@ namespace app;
 require_once "Model.php";
 require_once "Shop.php";
 require_once "Car.php";
-use \Exception as Exception;
-use function utils\gtsane as gtsane;
 
 class Application extends Model {
   protected static $table       = "applications";
   public    static $primary_col = "app_id";
-  // Belongs to one car and one shop
   protected static $dependables = array(Car::class, Shop::class);
   protected static $indexes     = array("car_id", "shop_id");
   public static    $fields      = array(
@@ -22,16 +19,9 @@ class Application extends Model {
 
   
   protected function mount(array $data): void {
-    $this->identifier = gtsane(static::$primary_col, $data);
-    unset($data[static::$primary_col]);
-    foreach($data as $field => $value){
-      if ($field == "submitted_at") {
-        // Submission date timestamp
-        $this->submitted_at = !\is_null(gtsane("submitted_at", $data)) ? (\strtotime(gtsane("submitted_at", $data))) : NULL;
-      break;
-      }
-      $this->{$field} = $value;
-    }
+    parent::mount($data);
+    // Change the submitted_at's value from datetime to timestamp
+    $this->submitted_at = !\is_null(gtsane("submitted_at", $data)) ? (\strtotime(gtsane("submitted_at", $data))) : NULL;
   }
 
   public static function create(array $data, bool $primary_key = false) {
