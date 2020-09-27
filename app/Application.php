@@ -5,6 +5,8 @@ require_once "Model.php";
 require_once "Shop.php";
 require_once "Car.php";
 
+use function utils\gtsane as gtsane;
+
 class Application extends Model {
   protected static $table       = "applications";
   public    static $primary_col = "app_id";
